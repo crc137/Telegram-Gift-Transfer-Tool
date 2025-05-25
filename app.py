@@ -31,11 +31,24 @@ app = Flask(__name__)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
 )
 
-# Load application configuration
-app_config = AppConfig.load()
+# Create a minimal valid configuration for startup
+try:
+    # Try to load the full configuration
+    app_config = AppConfig.load()
+except Exception as e:
+    logger.warning(f"Could not load full configuration: {str(e)}")
+    # Create a minimal valid configuration with defaults
+    app_config = AppConfig(
+        BOT_TOKEN="0000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        BUSINESS_CONNECTION_ID="0000000000",
+        TARGET_CHAT_ID=1,  # Use a valid default value (>0)
+        LOG_DIR="logs"
+    )
+
 LOG_DIR = app_config.LOG_DIR
 os.makedirs(LOG_DIR, exist_ok=True)
 

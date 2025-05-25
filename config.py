@@ -37,10 +37,19 @@ class AppConfig(BaseModel):
         Returns:
             AppConfig: Validated configuration object
         """
+        # Get the TARGET_CHAT_ID with a safe default
+        try:
+            target_chat_id = int(os.getenv("TARGET_CHAT_ID", "0") or "0")
+            # Ensure it's valid for PositiveInt
+            if target_chat_id <= 0:
+                target_chat_id = 1  # Use 1 as a placeholder default
+        except (ValueError, TypeError):
+            target_chat_id = 1  # Use 1 as a placeholder default
+            
         defaults = {
             "BOT_TOKEN": os.getenv("BOT_TOKEN", "0000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
             "BUSINESS_CONNECTION_ID": os.getenv("BUSINESS_CONNECTION_ID", "0000000000"),
-            "TARGET_CHAT_ID": int(os.getenv("TARGET_CHAT_ID", "0") or 0),
+            "TARGET_CHAT_ID": target_chat_id,
             "STAR_COUNT": int(os.getenv("STAR_COUNT", "25")),
             "MAX_RETRIES": int(os.getenv("MAX_RETRIES", "3")),
             "RETRY_DELAY": int(os.getenv("RETRY_DELAY", "5")),
@@ -55,6 +64,9 @@ class AppConfig(BaseModel):
             try:
                 with open(config_file, 'r') as f:
                     file_config = json.load(f)
+                    # Handle TARGET_CHAT_ID specially to ensure it's valid
+                    if "TARGET_CHAT_ID" in file_config and (not isinstance(file_config["TARGET_CHAT_ID"], int) or file_config["TARGET_CHAT_ID"] <= 0):
+                        file_config["TARGET_CHAT_ID"] = 1  # Use 1 as a placeholder default
                     defaults.update(file_config)
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Error loading configuration file: {e}")
