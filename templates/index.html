@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Gift Transfer Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .console {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            height: 400px;
+            overflow-y: auto;
+        }
+        
+        .console .error {
+            color: #f87171;
+        }
+        
+        .console .warning {
+            color: #fbbf24;
+        }
+        
+        .console .success {
+            color: #34d399;
+        }
+        
+        /* Custom scrollbar */
+        .console::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .console::-webkit-scrollbar-track {
+            background: #334155;
+        }
+        
+        .console::-webkit-scrollbar-thumb {
+            background-color: #64748b;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">Telegram Gift Transfer Tool</h1>
+        
+        <!-- Form Card -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Configuration</h2>
+            
+            <form id="configForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="bot_token" class="block text-sm font-medium text-gray-700 mb-1">Bot Token <span class="text-red-500">*</span></label>
+                        <input type="text" id="bot_token" name="bot_token" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <p class="mt-1 text-sm text-gray-500">Your bot token from BotFather</p>
+                    </div>
+                    
+                    <div>
+                        <label for="business_connection_id" class="block text-sm font-medium text-gray-700 mb-1">Business Connection ID <span class="text-red-500">*</span></label>
+                        <input type="text" id="business_connection_id" name="business_connection_id" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <p class="mt-1 text-sm text-gray-500">Business connection ID</p>
+                    </div>
+                    
+                    <div>
+                        <label for="target_chat_id" class="block text-sm font-medium text-gray-700 mb-1">Target Chat ID <span class="text-red-500">*</span></label>
+                        <input type="text" id="target_chat_id" name="target_chat_id" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <p class="mt-1 text-sm text-gray-500">Chat ID to transfer gifts to</p>
+                    </div>
+                    
+                    <div>
+                        <label for="star_count" class="block text-sm font-medium text-gray-700 mb-1">Star Count</label>
+                        <input type="number" id="star_count" name="star_count" value="25" min="1"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <p class="mt-1 text-sm text-gray-500">Number of stars to transfer</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center pt-4">
+                    <button type="submit" id="runButton"
+                        class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        Run Script
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Console Output Card -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Console Output</h2>
+                <div>
+                    <button id="clearConsoleBtn" class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 mr-2">
+                        Clear Console
+                    </button>
+                    <button id="downloadCurrentLogBtn" class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        Download Log
+                    </button>
+                </div>
+            </div>
+            
+            <div id="console" class="console">
+                <div class="text-gray-400">Welcome to Telegram Gift Transfer Tool. Configure settings above and click "Run Script" to start.</div>
+            </div>
+        </div>
+        
+        <!-- Previous Logs Card -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Previous Logs</h2>
+            
+            <div id="logsContainer" class="overflow-y-auto max-h-64">
+                <div class="text-gray-500 text-center py-4" id="noLogsMessage">No logs available</div>
+                <ul id="logsList" class="divide-y divide-gray-200"></ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl">
+            <div class="flex items-center space-x-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p class="text-lg font-medium">Processing...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const configForm = document.getElementById('configForm');
+            const runButton = document.getElementById('runButton');
+            const consoleOutput = document.getElementById('console');
+            const clearConsoleBtn = document.getElementById('clearConsoleBtn');
+            const downloadCurrentLogBtn = document.getElementById('downloadCurrentLogBtn');
+            const logsList = document.getElementById('logsList');
+            const noLogsMessage = document.getElementById('noLogsMessage');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            let eventSource = null;
+            
+            // Load available logs
+            loadLogs();
+            
+            // Form submission
+            configForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    bot_token: document.getElementById('bot_token').value,
+                    business_connection_id: document.getElementById('business_connection_id').value,
+                    target_chat_id: document.getElementById('target_chat_id').value,
+                    star_count: document.getElementById('star_count').value
+                };
+                
+                // Disable form and show loading
+                runButton.disabled = true;
+                runButton.classList.add('bg-blue-400');
+                runButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                runButton.textContent = 'Running...';
+                
+                // Clear console
+                consoleOutput.innerHTML = '';
+                
+                // Run the script
+                fetch('/api/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Script started successfully
+                        appendToConsole('Script started successfully', 'success');
+                        
+                        // Start listening for output
+                        startEventStream();
+                    } else {
+                        // Error starting script
+                        appendToConsole(`Error: ${data.message}`, 'error');
+                        
+                        // Re-enable form
+                        runButton.disabled = false;
+                        runButton.classList.remove('bg-blue-400');
+                        runButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        runButton.textContent = 'Run Script';
+                    }
+                })
+                .catch(error => {
+                    appendToConsole(`Error: ${error.message}`, 'error');
+                    
+                    // Re-enable form
+                    runButton.disabled = false;
+                    runButton.classList.remove('bg-blue-400');
+                    runButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    runButton.textContent = 'Run Script';
+                });
+            });
+            
+            // Clear console
+            clearConsoleBtn.addEventListener('click', function() {
+                consoleOutput.innerHTML = '';
+            });
+            
+            // Download current log
+            downloadCurrentLogBtn.addEventListener('click', function() {
+                window.location.href = '/api/current-log';
+            });
+            
+            // Start event stream for real-time updates
+            function startEventStream() {
+                // Close existing event source if open
+                if (eventSource) {
+                    eventSource.close();
+                }
+                
+                // Create new event source
+                eventSource = new EventSource('/api/stream');
+                
+                // Listen for messages
+                eventSource.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.line) {
+                        // Add line to console
+                        appendToConsole(data.line);
+                    }
+                    
+                    if (data.complete) {
+                        // Script completed
+                        appendToConsole('Script execution completed', 'success');
+                        
+                        // Close event source
+                        eventSource.close();
+                        eventSource = null;
+                        
+                        // Re-enable form
+                        runButton.disabled = false;
+                        runButton.classList.remove('bg-blue-400');
+                        runButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        runButton.textContent = 'Run Script';
+                        
+                        // Reload logs
+                        loadLogs();
+                    }
+                };
+                
+                // Error handling
+                eventSource.onerror = function() {
+                    appendToConsole('Error: Connection to server lost', 'error');
+                    
+                    // Close event source
+                    eventSource.close();
+                    eventSource = null;
+                    
+                    // Re-enable form
+                    runButton.disabled = false;
+                    runButton.classList.remove('bg-blue-400');
+                    runButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    runButton.textContent = 'Run Script';
+                };
+            }
+            
+            // Append message to console
+            function appendToConsole(message, type = '') {
+                const line = document.createElement('div');
+                line.textContent = message;
+                
+                if (type) {
+                    line.classList.add(type);
+                }
+                
+                // Detect common patterns and add styling
+                if (message.includes('ERROR') || message.includes('❌')) {
+                    line.classList.add('error');
+                } else if (message.includes('WARNING') || message.includes('⚠️')) {
+                    line.classList.add('warning');
+                } else if (message.includes('✅') || message.includes('successful')) {
+                    line.classList.add('success');
+                }
+                
+                consoleOutput.appendChild(line);
+                
+                // Scroll to bottom
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+            
+            // Load available logs
+            function loadLogs() {
+                fetch('/api/logs')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.logs && data.logs.length > 0) {
+                            // Show logs
+                            noLogsMessage.style.display = 'none';
+                            logsList.innerHTML = '';
+                            
+                            data.logs.forEach(log => {
+                                const li = document.createElement('li');
+                                li.className = 'py-3 flex justify-between items-center hover:bg-gray-50 px-2';
+                                
+                                const logName = document.createElement('span');
+                                logName.className = 'text-sm text-gray-700';
+                                logName.textContent = log;
+                                
+                                const downloadBtn = document.createElement('button');
+                                downloadBtn.className = 'text-sm text-blue-600 hover:text-blue-800';
+                                downloadBtn.textContent = 'Download';
+                                downloadBtn.addEventListener('click', function() {
+                                    window.location.href = `/api/logs/${log}`;
+                                });
+                                
+                                li.appendChild(logName);
+                                li.appendChild(downloadBtn);
+                                logsList.appendChild(li);
+                            });
+                        } else {
+                            // No logs available
+                            noLogsMessage.style.display = 'block';
+                            logsList.innerHTML = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading logs:', error);
+                    });
+            }
+        });
+    </script>
+</body>
+</html> 
