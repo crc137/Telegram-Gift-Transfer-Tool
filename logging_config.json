@@ -7,7 +7,7 @@
             "datefmt": "%Y-%m-%d %H:%M:%S"
         },
         "detailed": {
-            "format": "%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+            "format": "%(asctime)s - %(levelname)s - %(name)s - %(module)s:%(lineno)d - %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S"
         }
     },
@@ -19,10 +19,12 @@
             "stream": "ext://sys.stdout"
         },
         "file": {
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
-            "formatter": "standard",
+            "formatter": "detailed",
             "filename": "logs/gift_transfer_log.log",
+            "maxBytes": 10485760,
+            "backupCount": 5,
             "mode": "a"
         }
     },

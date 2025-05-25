@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Gift Transfer Tool</title>
+    <link rel="stylesheet" href="https://crc137.github.io/fontawesome-free-pro/all.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .console {
@@ -42,11 +43,16 @@
             border-radius: 4px;
         }
     </style>
+    <!-- Place this tag in your head or just before your close body tag. -->
+     <script async defer src="https://buttons.github.io/buttons.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">Telegram Gift Transfer Tool</h1>
-        
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-center text-blue-600">Telegram Gift Transfer Tool</h1>
+            <a class="github-button" href="https://github.com/crc137/Telegram-Gift-Transfer-Tool" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-size="large" data-show-count="true" aria-label="Star crc137/Telegram-Gift-Transfer-Tool on GitHub">Star</a>
+        </div>
+
         <!-- Form Card -->
         <div class="bg-white shadow-md rounded-lg p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4">Configuration</h2>
@@ -96,7 +102,7 @@
                 <div class="flex justify-center pt-4">
                     <button type="submit" id="runButton"
                         class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                        Run Script
+                        Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>
                     </button>
                 </div>
             </form>
@@ -105,13 +111,13 @@
         <!-- Console Output Card -->
         <div class="bg-white shadow-md rounded-lg p-6 mb-8">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Console Output</h2>
+                <h2 class="text-xl font-semibold"><i class="fa-duotone fa-thin fa-square-terminal"></i> Console Output</h2>
                 <div>
                     <button id="clearConsoleBtn" class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 mr-2">
-                        Clear Console
+                        Clear Console <i class="fa-duotone fa-thin fa-broom-wide"></i>
                     </button>
                     <button id="downloadCurrentLogBtn" class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                        Download Log
+                        Download Log <i class="fa-duotone fa-thin fa-file-arrow-down"></i>
                     </button>
                 </div>
             </div>
@@ -123,7 +129,7 @@
         
         <!-- Previous Logs Card -->
         <div class="bg-white shadow-md rounded-lg p-6">
-            <h2 class="text-xl font-semibold mb-4">Previous Logs</h2>
+            <h2 class="text-xl font-semibold mb-4"><i class="fa-duotone fa-thin fa-clipboard-list"></i> Previous Logs</h2>
             
             <div id="logsContainer" class="overflow-y-auto max-h-64">
                 <div class="text-gray-500 text-center py-4" id="noLogsMessage">No logs available</div>
@@ -180,7 +186,7 @@
                 consoleOutput.innerHTML = '';
                 
                 // Run the script
-                fetch('/telegramgifttransfertool/api/run', {
+                fetch('/api/run', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -224,7 +230,7 @@
             
             // Download current log
             downloadCurrentLogBtn.addEventListener('click', function() {
-                window.location.href = '/telegramgifttransfertool/api/current-log';
+                window.location.href = '/api/current-log';
             });
             
             // Start event stream for real-time updates
@@ -235,7 +241,7 @@
                 }
                 
                 // Create new event source
-                eventSource = new EventSource('/telegramgifttransfertool/api/stream');
+                eventSource = new EventSource('/api/stream');
                 
                 // Listen for messages
                 eventSource.onmessage = function(event) {
@@ -284,19 +290,23 @@
             // Append message to console
             function appendToConsole(message, type = '') {
                 const line = document.createElement('div');
-                line.textContent = message;
+                
+                // Add Font Awesome icons based on message content
+                if (message.includes('ERROR') || message.includes('❌')) {
+                    line.innerHTML = `<i class="fa-duotone fa-thin fa-hexagon-exclamation"></i> ${message}`;
+                    line.classList.add('error');
+                } else if (message.includes('WARNING') || message.includes('⚠️')) {
+                    line.innerHTML = `<i class="fa-duotone fa-thin fa-triangle-exclamation"></i> ${message}`;
+                    line.classList.add('warning');
+                } else if (message.includes('✅') || message.includes('successful')) {
+                    line.innerHTML = `<i class="fa-duotone fa-thin fa-square-check"></i> ${message}`;
+                    line.classList.add('success');
+                } else {
+                    line.textContent = message;
+                }
                 
                 if (type) {
                     line.classList.add(type);
-                }
-                
-                // Detect common patterns and add styling
-                if (message.includes('ERROR') || message.includes('❌')) {
-                    line.classList.add('error');
-                } else if (message.includes('WARNING') || message.includes('⚠️')) {
-                    line.classList.add('warning');
-                } else if (message.includes('✅') || message.includes('successful')) {
-                    line.classList.add('success');
                 }
                 
                 consoleOutput.appendChild(line);
@@ -307,7 +317,7 @@
             
             // Load available logs
             function loadLogs() {
-                fetch('/telegramgifttransfertool/telegramgifttransfertool/api/logs')
+                fetch('/api/logs')
                     .then(response => response.json())
                     .then(data => {
                         if (data.logs && data.logs.length > 0) {
@@ -327,7 +337,7 @@
                                 downloadBtn.className = 'text-sm text-blue-600 hover:text-blue-800';
                                 downloadBtn.textContent = 'Download';
                                 downloadBtn.addEventListener('click', function() {
-                                    window.location.href = `/telegramgifttransfertool/api/logs/${log}`;
+                                    window.location.href = `/api/logs/${log}`;
                                 });
                                 
                                 li.appendChild(logName);
