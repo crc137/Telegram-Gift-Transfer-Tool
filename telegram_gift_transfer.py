@@ -108,9 +108,9 @@ def log_and_print(message: str, level: str = "INFO") -> None:
     
     # Print with appropriate color based on level (this is in addition to the logger's console output)
     if level == "ERROR":
-        print(f"\033[91m{message}\033[0m")  # Red for errors
+        print(f"[91m{message}[0m")  # Red for errors
     elif level == "WARNING":
-        print(f"\033[93m{message}\033[0m")  # Yellow for warnings
+        print(f"[93m{message}[0m")  # Yellow for warnings
     elif level == "DEBUG":
         # Debug messages are usually verbose, so we don't print them to console unless configured
         pass
@@ -192,14 +192,14 @@ def check_api_connectivity() -> bool:
     Returns:
         bool: True if API is accessible, False otherwise
     """
-    log_and_print("\n🔄 Checking API connectivity...")
+    log_and_print("Checking API connectivity...")
     result = make_api_request("get_me", retry_count=1)
     
     if result.get('ok'):
-        log_and_print("✅ API connection successful")
+        log_and_print("API connection successful")
         return True
     else:
-        log_and_print(f"❌ API connection failed: {result.get('description', 'Unknown error')}", "ERROR")
+        log_and_print(f"API connection failed: {result.get('description', 'Unknown error')}", "ERROR")
         return False
 
 def validate_business_connection() -> bool:
@@ -209,16 +209,16 @@ def validate_business_connection() -> bool:
     Returns:
         bool: True if business connection ID is valid, False otherwise
     """
-    log_and_print("\n🔄 Validating business connection ID...")
+    log_and_print("Validating business connection ID...")
     result = make_api_request("get_business_star_balance", {
         "business_connection_id": BUSINESS_CONNECTION_ID
     })
     
     if result.get('ok'):
-        log_and_print("✅ Business connection ID validated successfully")
+        log_and_print("Business connection ID validated successfully")
         return True
     else:
-        log_and_print(f"❌ Invalid business connection ID: {result.get('description', 'Unknown error')}", "ERROR")
+        log_and_print(f"Invalid business connection ID: {result.get('description', 'Unknown error')}", "ERROR")
         return False
 
 def get_bot_info() -> Optional[Dict]:
@@ -228,24 +228,24 @@ def get_bot_info() -> Optional[Dict]:
     Returns:
         Optional[Dict]: Bot information or None if request failed
     """
-    log_and_print("\n🔄 Getting bot information...")
+    log_and_print("Getting bot information...")
     result = make_api_request("get_me")
     
     if result.get('ok'):
         bot_info = result.get('result', {})
-        log_and_print("✅ Bot information retrieved successfully")
-        log_and_print(f"   Username: @{bot_info.get('username')}")
-        log_and_print(f"   ID: {bot_info.get('id')}")
-        log_and_print(f"   Is Business Bot: {bot_info.get('is_business_bot', False)}")
+        log_and_print("Bot information retrieved successfully")
+        log_and_print(f"Username: @{bot_info.get('username')}")
+        log_and_print(f"ID: {bot_info.get('id')}")
+        log_and_print(f"Is Business Bot: {bot_info.get('is_business_bot', False)}")
         
         # Warning if not a business bot
         if not bot_info.get('is_business_bot', False):
-            log_and_print("⚠️ This bot is not a business bot. Gift and star functionality may be limited!", "WARNING")
-            log_and_print("   Consider upgrading to a business bot through BotFather.", "WARNING")
+            log_and_print("This bot is not a business bot. Gift and star functionality may be limited!", "WARNING")
+            log_and_print("Consider upgrading to a business bot through BotFather.", "WARNING")
         
         return bot_info
     else:
-        log_and_print(f"❌ Failed to get bot info: {result.get('description', 'Unknown error')}", "ERROR")
+        log_and_print(f"Failed to get bot info: {result.get('description', 'Unknown error')}", "ERROR")
         return None
 
 def validate_chat_id(chat_id: int) -> bool:
@@ -258,28 +258,28 @@ def validate_chat_id(chat_id: int) -> bool:
     Returns:
         bool: True if chat ID is valid, False otherwise
     """
-    log_and_print(f"\n🔄 Validating target chat (ID: {chat_id})...")
+    log_and_print(f"Validating target chat (ID: {chat_id})...")
     result = make_api_request("get_chat", {"chat_id": chat_id})
     
     if result.get('ok'):
         chat_info = result.get('result', {})
-        log_and_print("✅ Target chat validated successfully")
-        log_and_print(f"   Type: {chat_info.get('type')}")
+        log_and_print("Target chat validated successfully")
+        log_and_print(f"Type: {chat_info.get('type')}")
         
         if 'username' in chat_info:
-            log_and_print(f"   Username: @{chat_info.get('username')}")
+            log_and_print(f"Username: @{chat_info.get('username')}")
         if 'title' in chat_info:
-            log_and_print(f"   Title: {chat_info.get('title')}")
+            log_and_print(f"Title: {chat_info.get('title')}")
         if 'first_name' in chat_info:
-            log_and_print(f"   Name: {chat_info.get('first_name')} {chat_info.get('last_name', '')}")
+            log_and_print(f"Name: {chat_info.get('first_name')} {chat_info.get('last_name', '')}")
             
         # Check if chat accepts gifts
         if chat_info.get('can_send_gift') is False:
-            log_and_print("⚠️ This chat may not accept gifts!", "WARNING")
+            log_and_print("This chat may not accept gifts!", "WARNING")
             
         return True
     else:
-        log_and_print(f"❌ Failed to validate chat: {result.get('description', 'Unknown error')}", "ERROR")
+        log_and_print(f"Failed to validate chat: {result.get('description', 'Unknown error')}", "ERROR")
         return False
 
 def get_business_star_balance() -> int:
@@ -289,17 +289,17 @@ def get_business_star_balance() -> int:
     Returns:
         int: Star balance
     """
-    log_and_print("\n🔄 Checking business account star balance...")
+    log_and_print("Checking business account star balance...")
     result = make_api_request("get_business_star_balance", {
         "business_connection_id": BUSINESS_CONNECTION_ID
     })
     
     if result.get('ok'):
         star_balance = result.get('result', {}).get('amount', 0)
-        log_and_print(f"✅ Business account star balance: {star_balance}")
+        log_and_print(f"Business account star balance: {star_balance}")
         return star_balance
     else:
-        log_and_print(f"❌ Failed to get business star balance: {result.get('description', 'Unknown error')}", "ERROR")
+        log_and_print(f"Failed to get business star balance: {result.get('description', 'Unknown error')}", "ERROR")
         return 0
 
 def transfer_stars_to_bot() -> bool:
@@ -309,17 +309,17 @@ def transfer_stars_to_bot() -> bool:
     Returns:
         bool: True if transfer was successful, False otherwise
     """
-    log_and_print(f"\n🔄 Transferring {STAR_COUNT} stars to bot...")
+    log_and_print(f"Transferring {STAR_COUNT} stars to bot...")
     result = make_api_request("transfer_business_stars", {
         "business_connection_id": BUSINESS_CONNECTION_ID,
         "star_count": STAR_COUNT
     })
     
     if result.get('ok'):
-        log_and_print(f"✅ Successfully transferred {STAR_COUNT} stars to bot")
+        log_and_print(f"Successfully transferred {STAR_COUNT} stars to bot")
         return True
     else:
-        log_and_print(f"❌ Failed to transfer stars: {result.get('description', 'Unknown error')}", "ERROR")
+        log_and_print(f"Failed to transfer stars: {result.get('description', 'Unknown error')}", "ERROR")
         return False
 
 def wait_for_star_transfer(max_wait: int = TRANSFER_WAIT_TIME) -> bool:
@@ -332,7 +332,7 @@ def wait_for_star_transfer(max_wait: int = TRANSFER_WAIT_TIME) -> bool:
     Returns:
         bool: True if wait completed successfully
     """
-    log_and_print(f"⏳ Waiting up to {max_wait} seconds for star transfer to process...")
+    log_and_print(f"Waiting up to {max_wait} seconds for star transfer to process...")
     
     # Break the wait time into smaller chunks to be more responsive
     check_interval = 5  # Check every 5 seconds
@@ -345,14 +345,14 @@ def wait_for_star_transfer(max_wait: int = TRANSFER_WAIT_TIME) -> bool:
         # Log progress
         if i < checks - 1:  # Don't log the last check to avoid duplicate messages
             remaining = max_wait - ((i + 1) * check_interval)
-            log_and_print(f"   Still waiting... ({remaining} seconds remaining)", "DEBUG")
+            log_and_print(f"Still waiting... ({remaining} seconds remaining)", "DEBUG")
     
     # Handle remaining seconds
     remaining_seconds = max_wait % check_interval
     if remaining_seconds > 0:
         time.sleep(remaining_seconds)
     
-    log_and_print("✅ Wait completed")
+    log_and_print("Wait completed")
     return True
 
 def get_owned_gifts() -> List[Dict]:
@@ -362,7 +362,7 @@ def get_owned_gifts() -> List[Dict]:
     Returns:
         List[Dict]: List of owned gifts
     """
-    log_and_print("\n🔄 Retrieving owned gifts...")
+    log_and_print("Retrieving owned gifts...")
     result = make_api_request("get_business_gifts", {
         "business_connection_id": BUSINESS_CONNECTION_ID,
         "limit": 100
@@ -371,15 +371,15 @@ def get_owned_gifts() -> List[Dict]:
     if result.get('ok'):
         gifts = result.get('result', {}).get('gifts', [])
         total_count = result.get('result', {}).get('total_count', 0)
-        log_and_print(f"✅ Found {total_count} gifts")
+        log_and_print(f"Found {total_count} gifts")
         return gifts
     else:
-        log_and_print(f"❌ Failed to get gifts: {result.get('description', 'Unknown error')}", "ERROR")
+        log_and_print(f"Failed to get gifts: {result.get('description', 'Unknown error')}", "ERROR")
         return []
 
 def analyze_payment_error() -> None:
     """Analyze the PAYMENT_REQUIRED error in detail."""
-    log_and_print("\n🔍 Analyzing PAYMENT_REQUIRED error...", "WARNING")
+    log_and_print("Analyzing PAYMENT_REQUIRED error...", "WARNING")
     log_and_print("This error occurs when the bot doesn't have enough stars in its own pool.", "WARNING")
     log_and_print("Possible causes:", "WARNING")
     log_and_print("1. The bot is not a business bot (most likely cause)", "WARNING")
@@ -389,11 +389,11 @@ def analyze_payment_error() -> None:
     # Check only the business account balance
     business_stars = get_business_star_balance()
     
-    log_and_print("\n📊 Current star balance:")
+    log_and_print("Current star balance:")
     log_and_print(f"Business account stars: {business_stars}")
     log_and_print(f"Required for transfer: {STAR_COUNT}")
     
-    log_and_print("\nRecommended solutions:", "WARNING")
+    log_and_print("Recommended solutions:", "WARNING")
     log_and_print("1. Upgrade your bot to a business bot through BotFather", "WARNING")
     log_and_print("2. Create a new bot with 'Business Bot' type", "WARNING")
     log_and_print("3. Check the Telegram Bot API documentation", "WARNING")
@@ -411,7 +411,7 @@ def transfer_gift(gift_id: str, chat_id: int, transfer_star_count: int) -> bool:
     Returns:
         bool: True if transfer was successful, False otherwise
     """
-    log_and_print(f"\n🔄 Attempting to transfer gift {gift_id} to user {chat_id}...")
+    log_and_print(f"Attempting to transfer gift {gift_id} to user {chat_id}...")
     result = make_api_request("transfer_gift", {
         "business_connection_id": BUSINESS_CONNECTION_ID,
         "owned_gift_id": gift_id,
@@ -420,23 +420,23 @@ def transfer_gift(gift_id: str, chat_id: int, transfer_star_count: int) -> bool:
     })
     
     if result.get('ok'):
-        log_and_print(f"✅ Gift {gift_id} successfully transferred to user {chat_id}")
+        log_and_print(f"Gift {gift_id} successfully transferred to user {chat_id}")
         return True
     else:
         error_desc = result.get('description', 'Unknown error')
         error_code = result.get('error_code', 0)
-        log_and_print(f"❌ Error transferring gift: {error_desc} (error code: {error_code})", "ERROR")
+        log_and_print(f"Error transferring gift: {error_desc} (error code: {error_code})", "ERROR")
         
         if "PAYMENT_REQUIRED" in error_desc:
             analyze_payment_error()
         elif "CHAT_NOT_FOUND" in error_desc:
-            log_and_print("❌ The target chat ID is invalid or inaccessible.", "ERROR")
+            log_and_print("e target chat ID is invalid or inaccessible.", "ERROR")
             log_and_print("Please verify that TARGET_CHAT_ID is correct and the user has interacted with the bot.", "ERROR")
         elif "Forbidden" in error_desc:
-            log_and_print("❌ The bot does not have permission to perform this action.", "ERROR")
+            log_and_print("e bot does not have permission to perform this action.", "ERROR")
             log_and_print("Ensure the bot has necessary permissions and the user has not blocked it.", "ERROR")
         elif "Bad Request" in error_desc:
-            log_and_print("❌ Invalid parameters in the transfer request.", "ERROR")
+            log_and_print("Invalid parameters in the transfer request.", "ERROR")
             log_and_print("Check owned_gift_id, transfer_star_count, and business_connection_id.", "ERROR")
         
         return False
@@ -457,7 +457,7 @@ def display_gifts(gifts: List[Dict]) -> None:
         can_transfer = gift.get('can_be_transferred', False)
         transfer_cost = gift.get('transfer_star_count', 0)
         
-        log_and_print(f"\n🎁 Gift {i}:")
+        log_and_print(f"Gift {i}:")
         log_and_print(f"ID: {gift_id}")
         log_and_print(f"Name: {gift_name} ({gift_full_name})")
         log_and_print(f"Type: {gift_type}")
@@ -479,17 +479,17 @@ def select_gift_interactive(gifts: List[Dict]) -> Optional[Dict]:
         log_and_print(f"\nEnter the gift number to transfer (1-{len(gifts)}):")
         choice = input().strip()
         if not choice:
-            log_and_print("❌ No input provided", "ERROR")
+            log_and_print("No input provided", "ERROR")
             return None
             
         choice = int(choice)
         if 1 <= choice <= len(gifts):
             return gifts[choice - 1]
         else:
-            log_and_print(f"❌ Invalid choice. Enter a number from 1 to {len(gifts)}", "ERROR")
+            log_and_print(f"Invalid choice. Enter a number from 1 to {len(gifts)}", "ERROR")
             return None
     except (ValueError, EOFError):
-        log_and_print("❌ Invalid input. Please enter a number", "ERROR")
+        log_and_print("Invalid input. Please enter a number", "ERROR")
         return None
 
 def find_gift_by_id(gifts: List[Dict], gift_id: str) -> Optional[Dict]:
@@ -552,42 +552,42 @@ def main(gift_id: Optional[str] = None) -> bool:
     
     # Step 1: Check API connectivity
     if not check_api_connectivity():
-        log_and_print("❌ Terminating: Could not connect to Telegram API", "ERROR")
+        log_and_print("Terminating: Could not connect to Telegram API", "ERROR")
         return False
     
     # Step 2: Validate business connection
     if not validate_business_connection():
-        log_and_print("❌ Terminating: Invalid BUSINESS_CONNECTION_ID", "ERROR")
+        log_and_print("Terminating: Invalid BUSINESS_CONNECTION_ID", "ERROR")
         log_and_print("Please verify the BUSINESS_CONNECTION_ID in your Telegram business account settings.", "ERROR")
         return False
     
     # Step 3: Get bot info and check if it's a business bot
     bot_info = get_bot_info()
     if not bot_info:
-        log_and_print("❌ Terminating: Could not retrieve bot information", "ERROR")
+        log_and_print("Terminating: Could not retrieve bot information", "ERROR")
         return False
     
     # Check if bot is a business bot
     is_business_bot = bot_info.get('is_business_bot', False)
     
     if not is_business_bot and not BYPASS_BUSINESS_CHECK:
-        log_and_print("\n❌ Terminating: Bot is not a business bot.", "ERROR")
+        log_and_print("Terminating: Bot is not a business bot.", "ERROR")
         log_and_print("Gift and star transfer functionality requires a business bot.", "ERROR")
         log_and_print("To resolve this:", "ERROR")
         log_and_print(f"1. Contact @BotFather and check if @{bot_info.get('username')} can be upgraded to a business bot.", "ERROR")
         log_and_print("2. Alternatively, create a new business bot using /newbot and enable business features.", "ERROR")
         log_and_print("3. Update BOT_TOKEN in the script with the new token.", "ERROR")
-        log_and_print("\nTo bypass this check for testing (not recommended for production):", "WARNING")
+        log_and_print("To bypass this check for testing (not recommended for production):", "WARNING")
         log_and_print("Add \"BYPASS_BUSINESS_CHECK\": true to your config file.", "WARNING")
         return False
     
     if not is_business_bot and BYPASS_BUSINESS_CHECK:
-        log_and_print("\n⚠️ WARNING: Bot is not a business bot, but check is bypassed.", "WARNING")
+        log_and_print("WARNING: Bot is not a business bot, but check is bypassed.", "WARNING")
         log_and_print("Some functionality may not work as expected!", "WARNING")
     
     # Step 4: Validate target chat
     if not validate_chat_id(TARGET_CHAT_ID):
-        log_and_print("❌ Terminating: Invalid target chat ID", "ERROR")
+        log_and_print("Terminating: Invalid target chat ID", "ERROR")
         return False
     
     # Step 5: Check business account star balance
@@ -595,32 +595,32 @@ def main(gift_id: Optional[str] = None) -> bool:
     required_stars = STAR_COUNT * 2 if ENABLE_REDUNDANT_TRANSFER else STAR_COUNT
     
     if business_stars < required_stars:
-        log_and_print(f"❌ Terminating: Not enough stars in business account (need at least {required_stars}, have {business_stars})", "ERROR")
+        log_and_print(f"Terminating: Not enough stars in business account (need at least {required_stars}, have {business_stars})", "ERROR")
         return False
     
     # Step 6: Inform about bot star balance constraints
-    log_and_print("\n⚠️ NOTE: The Telegram API does not provide a way to check bot star balance", "WARNING")
-    log_and_print("   This is a limitation especially relevant for non-business bots", "WARNING")
+    log_and_print("NOTE: The Telegram API does not provide a way to check bot star balance", "WARNING")
+    log_and_print("This is a limitation especially relevant for non-business bots", "WARNING")
     
     # Step 7: Transfer stars to bot
     if not transfer_stars_to_bot():
-        log_and_print("❌ Terminating: Failed to transfer stars to bot", "ERROR")
+        log_and_print("Terminating: Failed to transfer stars to bot", "ERROR")
         return False
     
     # Step 8: Additional star transfer for reliability (if enabled)
     if ENABLE_REDUNDANT_TRANSFER:
-        log_and_print("\n🔄 Attempting additional star transfer for reliability...")
+        log_and_print("Attempting additional star transfer for reliability...")
         if not transfer_stars_to_bot():
-            log_and_print("⚠️ Warning: Additional star transfer failed", "WARNING")
+            log_and_print("Warning: Additional star transfer failed", "WARNING")
     
     # Step 9: Wait for star transfer to process using improved waiting method
     if not wait_for_star_transfer(TRANSFER_WAIT_TIME):
-        log_and_print("⚠️ Warning: Star transfer may not have completed", "WARNING")
+        log_and_print("Warning: Star transfer may not have completed", "WARNING")
     
     # Step 10: Get owned gifts
     gifts = get_owned_gifts()
     if not gifts:
-        log_and_print("❌ Terminating: No gifts found to transfer", "ERROR")
+        log_and_print("Terminating: No gifts found to transfer", "ERROR")
         return False
     
     # Step 11: Display gift list
@@ -631,7 +631,7 @@ def main(gift_id: Optional[str] = None) -> bool:
     if gift_id:
         selected_gift = find_gift_by_id(gifts, gift_id)
         if not selected_gift:
-            log_and_print(f"❌ Gift with ID {gift_id} not found", "ERROR")
+            log_and_print(f"Gift with ID {gift_id} not found", "ERROR")
             return False
     else:
         selected_gift = select_gift_interactive(gifts)
@@ -643,12 +643,12 @@ def main(gift_id: Optional[str] = None) -> bool:
     gift_name = selected_gift.get('gift', {}).get('base_name', 'Unknown')
     transfer_cost = selected_gift.get('transfer_star_count', STAR_COUNT)
     
-    log_and_print(f"\nSelected gift: {gift_name} (ID: {gift_id})")
+    log_and_print(f"Selected gift: {gift_name} (ID: {gift_id})")
     
     # Step 14: Validate gift can be transferred
     is_valid, error_message = validate_gift_for_transfer(selected_gift)
     if not is_valid:
-        log_and_print(f"❌ {error_message}", "ERROR")
+        log_and_print(f"{error_message}", "ERROR")
         return False
     
     # Step 15: Transfer gift

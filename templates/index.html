@@ -177,6 +177,12 @@
                 document.getElementById('api_key').value = savedApiKey;
             }
             
+            // Helper function to get API key header
+            function getApiKeyHeader() {
+                const apiKey = localStorage.getItem('apiKey') || '';
+                return apiKey ? { 'X-API-Key': apiKey } : {};
+            }
+            
             // Form submission
             configForm.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -199,7 +205,7 @@
                 runButton.disabled = true;
                 runButton.classList.add('bg-blue-400');
                 runButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                runButton.textContent = 'Running...';
+                runButton.innerHTML = 'Running...';
                 
                 // Clear console
                 consoleOutput.innerHTML = '';
@@ -209,7 +215,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-Key': localStorage.getItem('apiKey') || ''
+                        ...getApiKeyHeader()
                     },
                     body: JSON.stringify(formData)
                 })
@@ -229,7 +235,7 @@
                         runButton.disabled = false;
                         runButton.classList.remove('bg-blue-400');
                         runButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                        runButton.textContent = 'Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>';
+                        runButton.innerHTML = 'Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>';
                     }
                 })
                 .catch(error => {
@@ -239,7 +245,7 @@
                     runButton.disabled = false;
                     runButton.classList.remove('bg-blue-400');
                     runButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                    runButton.textContent = 'Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>';
+                    runButton.innerHTML = 'Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>';
                 });
             });
             
@@ -250,15 +256,19 @@
             
             // Download current log
             downloadCurrentLogBtn.addEventListener('click', function() {
-                // Add API key to the request if available
                 const apiKey = localStorage.getItem('apiKey') || '';
+                const url = '/telegramgifttransfertool/api/current-log';
+                
                 if (apiKey) {
-                    fetch('/telegramgifttransfertool/api/current-log', {
-                        headers: {
-                            'X-API-Key': apiKey
-                        }
+                    fetch(url, {
+                        headers: getApiKeyHeader()
                     })
-                    .then(response => response.blob())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to download log');
+                        }
+                        return response.blob();
+                    })
                     .then(blob => {
                         const url = window.URL.createObjectURL(blob);
                         const a = document.createElement('a');
@@ -270,9 +280,10 @@
                     })
                     .catch(error => {
                         console.error('Error downloading log:', error);
+                        appendToConsole(`Error: ${error.message}`, 'error');
                     });
                 } else {
-                    window.location.href = '/telegramgifttransfertool/api/current-log';
+                    window.location.href = url;
                 }
             });
             
@@ -283,8 +294,13 @@
                     eventSource.close();
                 }
                 
-                // Create new event source
-                eventSource = new EventSource('/telegramgifttransfertool/api/stream');
+                // Create new event source with API key in the URL for authentication
+                const apiKey = localStorage.getItem('apiKey') || '';
+                const streamUrl = apiKey 
+                    ? `/telegramgifttransfertool/api/stream?api_key=${encodeURIComponent(apiKey)}`
+                    : '/telegramgifttransfertool/api/stream';
+                
+                eventSource = new EventSource(streamUrl);
                 
                 // Listen for messages
                 eventSource.onmessage = function(event) {
@@ -312,7 +328,7 @@
                         runButton.disabled = false;
                         runButton.classList.remove('bg-blue-400');
                         runButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                        runButton.textContent = `Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>`;
+                        runButton.innerHTML = 'Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>';
                         
                         // Reload logs
                         loadLogs();
@@ -332,7 +348,7 @@
                         runButton.disabled = false;
                         runButton.classList.remove('bg-blue-400');
                         runButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                        runButton.textContent = `Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>`;
+                        runButton.innerHTML = 'Run Script <i class="fa-duotone fa-thin fa-person-to-portal"></i>';
                     }, 1000);
                 };
             }
@@ -368,9 +384,7 @@
             // Load available logs
             function loadLogs() {
                 fetch('/telegramgifttransfertool/api/logs', {
-                    headers: {
-                        'X-API-Key': localStorage.getItem('apiKey') || ''
-                    }
+                    headers: getApiKeyHeader()
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -391,12 +405,12 @@
                                 downloadBtn.className = 'text-sm text-blue-600 hover:text-blue-800';
                                 downloadBtn.textContent = 'Download';
                                 downloadBtn.addEventListener('click', function() {
+                                    const url = `/telegramgifttransfertool/api/logs/${log}`;
                                     const apiKey = localStorage.getItem('apiKey') || '';
+                                    
                                     if (apiKey) {
-                                        fetch(`/telegramgifttransfertool/api/logs/${log}`, {
-                                            headers: {
-                                                'X-API-Key': apiKey
-                                            }
+                                        fetch(url, {
+                                            headers: getApiKeyHeader()
                                         })
                                         .then(response => response.blob())
                                         .then(blob => {
@@ -412,7 +426,7 @@
                                             console.error('Error downloading log:', error);
                                         });
                                     } else {
-                                        window.location.href = `/telegramgifttransfertool/api/logs/${log}`;
+                                        window.location.href = url;
                                     }
                                 });
                                 

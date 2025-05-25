@@ -450,6 +450,7 @@ def transfer_gift():
     })
 
 @app.route('/telegramgifttransfertool/api/logs')
+@require_api_key
 def get_logs():
     """Get a list of available log files."""
     log_files = []
@@ -463,6 +464,7 @@ def get_logs():
     })
 
 @app.route('/telegramgifttransfertool/api/logs/<filename>')
+@require_api_key
 def download_log(filename):
     """Download a specific log file."""
     if os.path.exists(os.path.join(LOG_DIR, filename)):
@@ -479,6 +481,7 @@ def download_log(filename):
         }), 404
 
 @app.route('/telegramgifttransfertool/api/current-log')
+@require_api_key
 def download_current_log():
     """Download the current log file."""
     global current_log_file
@@ -499,6 +502,14 @@ def download_current_log():
 @app.route('/telegramgifttransfertool/api/stream')
 def stream():
     """Stream the output of the current process with improved efficiency."""
+    # Check for API key in URL parameter for EventSource compatibility
+    api_key = request.args.get('api_key')
+    expected_key = app_config.API_KEY
+    
+    # Validate API key if one is expected
+    if expected_key and api_key != expected_key:
+        return jsonify({"success": False, "message": "Invalid or missing API key."}), 401
+    
     def generate():
         while True:
             try:
