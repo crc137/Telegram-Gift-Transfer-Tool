@@ -19,7 +19,7 @@ current_log_file = None
 process_output = []
 process_running = False
 
-@app.route('/')
+@app.route('/telegramgifttransfertool')
 def index():
     """Render the main page with the form."""
     return render_template('index.html')
