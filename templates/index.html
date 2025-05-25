@@ -168,7 +168,7 @@
                 consoleOutput.innerHTML = '';
                 
                 // Run the script
-                fetch('/api/run', {
+                fetch('/telegramgifttransfertool/api/run', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -212,7 +212,7 @@
             
             // Download current log
             downloadCurrentLogBtn.addEventListener('click', function() {
-                window.location.href = '/api/current-log';
+                window.location.href = '/telegramgifttransfertool/api/current-log';
             });
             
             // Start event stream for real-time updates
@@ -223,7 +223,7 @@
                 }
                 
                 // Create new event source
-                eventSource = new EventSource('/api/stream');
+                eventSource = new EventSource('/telegramgifttransfertool/api/stream');
                 
                 // Listen for messages
                 eventSource.onmessage = function(event) {
@@ -295,7 +295,7 @@
             
             // Load available logs
             function loadLogs() {
-                fetch('/api/logs')
+                fetch('/telegramgifttransfertool/api/logs')
                     .then(response => response.json())
                     .then(data => {
                         if (data.logs && data.logs.length > 0) {
@@ -315,7 +315,7 @@
                                 downloadBtn.className = 'text-sm text-blue-600 hover:text-blue-800';
                                 downloadBtn.textContent = 'Download';
                                 downloadBtn.addEventListener('click', function() {
-                                    window.location.href = `/api/logs/${log}`;
+                                    window.location.href = `/telegramgifttransfertool/api/logs/${log}`;
                                 });
                                 
                                 li.appendChild(logName);
