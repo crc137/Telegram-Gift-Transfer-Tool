@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+temp_config_*.json
+
+# IDE files
+.idea/
+.vscode/ 
