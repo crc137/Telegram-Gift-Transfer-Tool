@@ -354,14 +354,22 @@ def main():
     
     # Check if bot is a business bot
     is_business_bot = bot_info.get('is_business_bot', False)
-    if not is_business_bot:
+    bypass_business_check = config_data.get('BYPASS_BUSINESS_CHECK', False) if 'config_data' in locals() else False
+    
+    if not is_business_bot and not bypass_business_check:
         log_and_print("\n❌ Terminating: Bot is not a business bot.", "ERROR")
         log_and_print("Gift and star transfer functionality requires a business bot.", "ERROR")
         log_and_print("To resolve this:", "ERROR")
         log_and_print(f"1. Contact @BotFather and check if @{bot_info.get('username')} can be upgraded to a business bot.", "ERROR")
         log_and_print("2. Alternatively, create a new business bot using /newbot and enable business features.", "ERROR")
         log_and_print("3. Update BOT_TOKEN in the script with the new token.", "ERROR")
+        log_and_print("\nTo bypass this check for testing (not recommended for production):", "WARNING")
+        log_and_print("Add \"BYPASS_BUSINESS_CHECK\": true to your config file.", "WARNING")
         return
+    
+    if not is_business_bot and bypass_business_check:
+        log_and_print("\n⚠️ WARNING: Bot is not a business bot, but check is bypassed.", "WARNING")
+        log_and_print("Some functionality may not work as expected!", "WARNING")
     
     # Step 4: Validate target chat
     if not validate_chat_id(TARGET_CHAT_ID):

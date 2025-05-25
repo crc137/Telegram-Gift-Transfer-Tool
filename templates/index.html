@@ -80,6 +80,17 @@
                             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <p class="mt-1 text-sm text-gray-500">Number of stars to transfer</p>
                     </div>
+                    
+                    <div class="col-span-2">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="bypass_business_check" name="bypass_business_check"
+                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="bypass_business_check" class="ml-2 block text-sm text-gray-700">
+                                Bypass business bot check (testing only)
+                            </label>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">Enable this only for testing. Some features may not work with non-business bots.</p>
+                    </div>
                 </div>
                 
                 <div class="flex justify-center pt-4">
@@ -155,7 +166,8 @@
                     bot_token: document.getElementById('bot_token').value,
                     business_connection_id: document.getElementById('business_connection_id').value,
                     target_chat_id: document.getElementById('target_chat_id').value,
-                    star_count: document.getElementById('star_count').value
+                    star_count: document.getElementById('star_count').value,
+                    bypass_business_check: document.getElementById('bypass_business_check').checked
                 };
                 
                 // Disable form and show loading
@@ -168,7 +180,7 @@
                 consoleOutput.innerHTML = '';
                 
                 // Run the script
-                fetch('/telegramgifttransfertool/api/run', {
+                fetch('/api/run', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -212,7 +224,7 @@
             
             // Download current log
             downloadCurrentLogBtn.addEventListener('click', function() {
-                window.location.href = '/telegramgifttransfertool/api/current-log';
+                window.location.href = '/api/current-log';
             });
             
             // Start event stream for real-time updates
@@ -223,7 +235,7 @@
                 }
                 
                 // Create new event source
-                eventSource = new EventSource('/telegramgifttransfertool/api/stream');
+                eventSource = new EventSource('/api/stream');
                 
                 // Listen for messages
                 eventSource.onmessage = function(event) {
@@ -295,7 +307,7 @@
             
             // Load available logs
             function loadLogs() {
-                fetch('/telegramgifttransfertool/api/logs')
+                fetch('/api/logs')
                     .then(response => response.json())
                     .then(data => {
                         if (data.logs && data.logs.length > 0) {
@@ -315,7 +327,7 @@
                                 downloadBtn.className = 'text-sm text-blue-600 hover:text-blue-800';
                                 downloadBtn.textContent = 'Download';
                                 downloadBtn.addEventListener('click', function() {
-                                    window.location.href = `/telegramgifttransfertool/api/logs/${log}`;
+                                    window.location.href = `/api/logs/${log}`;
                                 });
                                 
                                 li.appendChild(logName);
