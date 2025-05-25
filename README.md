@@ -41,6 +41,16 @@ python app.py
 
 3. The application will automatically use the PORT environment variable provided by the hosting platform
 
+### Environment Settings
+
+The application uses the following environment variables:
+
+- `PORT` - The port on which the application will run (default: 5000)
+- `DEBUG` - Set to "True" to enable debug mode (default: False)
+- `LOG_LEVEL` - Set the logging level (default: INFO)
+
+For production deployment, you can configure these in your hosting platform's environment settings.
+
 ### Using the Web Interface
 
 1. Fill in the required fields:

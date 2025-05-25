@@ -4,8 +4,16 @@ import json
 import time
 import subprocess
 import threading
+import logging
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, send_file, Response, stream_with_context
+
+# Configure logging based on environment
+log_level = os.environ.get('LOG_LEVEL', 'INFO')
+logging.basicConfig(
+    level=getattr(logging, log_level),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 app = Flask(__name__)
 
@@ -206,6 +214,14 @@ def stream():
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 if __name__ == '__main__':
-    # Get port from environment variable for production deployment
-    port = int(os.environ.get('PORT', 3002))
-    app.run(debug=False, host='0.0.0.0', port=port) 
+    # Get configuration from environment variables
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    
+    # Log startup information
+    logging.info(f"Starting Telegram Gift Transfer Tool on port {port}")
+    logging.info(f"Debug mode: {debug}")
+    logging.info(f"Log level: {log_level}")
+    
+    # Run the Flask application
+    app.run(debug=debug, host='0.0.0.0', port=port) 
