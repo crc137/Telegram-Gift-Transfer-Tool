@@ -1,3 +1,9 @@
 Flask
+Werkzeug
 requests
 python-dotenv
+pydantic
+flask-limiter
+python-json-logger
+pytest
+pytest-cov
