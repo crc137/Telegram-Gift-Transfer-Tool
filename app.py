@@ -206,4 +206,6 @@ def stream():
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000) 
+    # Get port from environment variable for production deployment
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port) 
