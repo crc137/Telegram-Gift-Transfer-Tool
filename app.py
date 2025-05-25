@@ -532,7 +532,20 @@ def add_security_headers(response):
     """Add security headers to all responses."""
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'DENY'
-    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' https://cdn.tailwindcss.com https://buttons.github.io https://crc137.github.io; style-src 'self' 'unsafe-inline' https://crc137.github.io; img-src 'self' data:;"
+    
+    # Update CSP to allow inline scripts, external fonts, and external connections
+    csp_policy = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://buttons.github.io "
+        "https://crc137.github.io https://static.cloudflareinsights.com; "
+        "style-src 'self' 'unsafe-inline' https://crc137.github.io; "
+        "img-src 'self' data: https://*; "
+        "font-src 'self' data: https://*; "
+        "connect-src 'self' https://api.github.com https://*; "
+        "frame-src 'self'"
+    )
+    response.headers['Content-Security-Policy'] = csp_policy
+    
     return response
 
 if __name__ == '__main__':
