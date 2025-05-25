@@ -108,9 +108,9 @@ def log_and_print(message: str, level: str = "INFO") -> None:
     
     # Print with appropriate color based on level (this is in addition to the logger's console output)
     if level == "ERROR":
-        print(f"[91m{message}[0m")  # Red for errors
+        print(f"{message}")  # Red for errors
     elif level == "WARNING":
-        print(f"[93m{message}[0m")  # Yellow for warnings
+        print(f"{message}")  # Yellow for warnings
     elif level == "DEBUG":
         # Debug messages are usually verbose, so we don't print them to console unless configured
         pass
