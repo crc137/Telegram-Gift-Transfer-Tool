@@ -24,7 +24,7 @@ def index():
     """Render the main page with the form."""
     return render_template('index.html')
 
-@app.route('/api/run', methods=['POST'])
+@app.route('/telegramgifttransfertool/api/run', methods=['POST'])
 def run_script():
     """Run the Telegram Gift Transfer Tool with the provided parameters."""
     global current_process, current_log_file, process_output, process_running
@@ -124,7 +124,7 @@ def run_script():
         "timestamp": timestamp
     })
 
-@app.route('/api/status')
+@app.route('/telegramgifttransfertool/api/status')
 def get_status():
     """Get the current status of the running process."""
     global process_running, process_output
@@ -134,7 +134,7 @@ def get_status():
         "output": process_output
     })
 
-@app.route('/api/logs')
+@app.route('/telegramgifttransfertool/api/logs')
 def get_logs():
     """Get a list of available log files."""
     log_files = []
@@ -147,7 +147,7 @@ def get_logs():
         "logs": log_files
     })
 
-@app.route('/api/logs/<filename>')
+@app.route('/telegramgifttransfertool/api/logs/<filename>')
 def download_log(filename):
     """Download a specific log file."""
     if os.path.exists(os.path.join(LOG_DIR, filename)):
@@ -163,7 +163,7 @@ def download_log(filename):
             "message": "Log file not found."
         }), 404
 
-@app.route('/api/current-log')
+@app.route('/telegramgifttransfertool/api/current-log')
 def download_current_log():
     """Download the current log file."""
     global current_log_file
@@ -181,7 +181,7 @@ def download_current_log():
             "message": "No current log file available."
         }), 404
 
-@app.route('/api/stream')
+@app.route('/telegramgifttransfertool/api/stream')
 def stream():
     """Stream the output of the current process."""
     def generate():
